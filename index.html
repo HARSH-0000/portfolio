@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsh Sharma - AI & ML Engineer</title>
+
+    <!-- Google Fonts: Inter for that sleek tech/AI vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* Cyberpunk / High-Tech Theme Variables */
+        :root {
+            --bg-color: #0a0a0a;
+            --surface-color: rgba(255, 255, 255, 0.02);
+            --surface-border: rgba(0, 255, 198, 0.15);
+            --text-main: #f0f0f0;
+            --text-muted: #8892b0;
+            --accent-teal: #00FFC6;
+            /* Electric Mint/Teal */
+            --accent-blue: #0088ff;
+            --gradient: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            --glass-blur: blur(16px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background: var(--accent-teal);
+            color: #000;
+        }
+
+        /* WebGL Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 120px 10%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 25px;
+            letter-spacing: -0.04em;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 50px;
+            display: inline-block;
+            position: relative;
+            letter-spacing: -0.02em;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 40%;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(0, 255, 198, 0.5);
+        }
+
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .teal-text {
+            color: var(--accent-teal);
+            text-shadow: 0 0 15px rgba(0, 255, 198, 0.4);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 36px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #000;
+            background: var(--accent-teal);
+            border: 1px solid var(--accent-teal);
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 198, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--accent-teal);
+            box-shadow: 0 0 35px rgba(0, 255, 198, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .glass-panel {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            align-items: flex-start;
+            text-align: left;
+            justify-content: center;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--text-muted);
+            max-width: 650px;
+            margin-bottom: 40px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(0, 255, 198, 0.03);
+            border: 1px solid rgba(0, 255, 198, 0.1);
+            padding: 20px 30px;
+            border-radius: 12px;
+            min-width: 150px;
+        }
+
+        .stat-card h4 {
+            font-size: 2.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .stat-card span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- About Section (Tech DNA) --- */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .terminal-block {
+            font-family: 'Courier New', Courier, monospace;
+            background: #050505;
+            border: 1px solid #222;
+            padding: 25px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #222;
+        }
+
+        .term-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .term-dot:nth-child(1) {
+            background: #ff5f56;
+        }
+
+        .term-dot:nth-child(2) {
+            background: #ffbd2e;
+        }
+
+        .term-dot:nth-child(3) {
+            background: #27c93f;
+        }
+
+        .terminal-content {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #a0aabf;
+        }
+
+        .terminal-content .keyword {
+            color: var(--accent-teal);
+        }
+
+        .terminal-content .string {
+            color: #f1fa8c;
+        }
+
+        .terminal-content .comment {
+            color: #6272a4;
+        }
+
+        .about-text {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+        }
+
+        /* --- Projects Section --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            transition: transform 0.4s ease, border-color 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 255, 198, 0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 198, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 255, 198, 0.1);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-meta {
+            color: var(--accent-teal);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .project-card h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .project-card p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .tech-stack span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        /* --- Skills Section --- */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .skill-tag {
+            padding: 12px 24px;
+            background: var(--surface-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skill-tag::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-teal);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-teal);
+            transition: transform 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            border-color: var(--accent-teal);
+            background: rgba(0, 255, 198, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .skill-tag:hover::before {
+            transform: scale(1.5);
+        }
+
+        /* --- Contact Section --- */
+        .contact .glass-panel {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .contact form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .contact input,
+        .contact textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .contact input:focus,
+        .contact textarea:focus {
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 15px rgba(0, 255, 198, 0.2);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .contact textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .contact .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* --- Scroll Animations --- */
+        .sc-hidden {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .sc-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .delay-2 {
+            transition-delay: 0.2s;
+        }
+
+        .delay-3 {
+            transition-delay: 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 100px 5%;
+            }
+
+            .hero {
+                text-align: center;
+                align-items: center;
+            }
+
+            .hero p {
+                margin: 0 auto 30px auto;
+            }
+
+            h2::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Target for Three.js Node Graph Background -->
+    <div id="canvas-container"></div>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero sc-hidden" id="home">
+            <h1 class="delay-1">Hi, I'm <br><span class="teal-text">Harsh Sharma</span></h1>
+            <p class="delay-2">
+                Aspiring Machine Learning Engineer with hands-on experience in Python,
+                Machine Learning, Deep Learning, and LLM models.
+            </p>
+
+            <div class="delay-3"
+                style="display: flex; gap: 15px; margin-bottom: 25px; align-items: center; flex-wrap: wrap;">
+                <a href="#about" class="btn">Explore Architecture</a>
+                <a href="cv.pdf" download="cv.pdf" target="_blank" class="btn"
+                    style="background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.2);">Download
+                    CV</a>
+            </div>
+
+            <div class="social-links delay-3" style="display: flex; gap: 20px; font-size: 1.1rem; margin-bottom: 40px;">
+                <!-- NOTE: Replace '#' with your actual profile links -->
+                <a href="https://github.com/HARSH-0000" target="_blank"
+                    style="color: var(--accent-teal); text-decoration: none; font-weight: 600;">GitHub</a>
+                <a href="https://www.linkedin.com/in/harsh-sharma4131" target="_blank"
+                    style="color: var(--accent-teal); text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <a href="https://www.instagram.com/its_me_harsh_014/" target="_blank"
+                    style="color: var(--accent-teal); text-decoration: none; font-weight: 600;">Instagram</a>
+            </div>
+
+            <div class="hero-stats sc-hidden delay-3">
+                <div class="stat-card">
+                    <h4>ML/AI</h4>
+                    <span>Core Focus</span>
+                </div>
+                <div class="stat-card">
+                    <h4>LLMs</h4>
+                    <span>Implementation</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT ME SECTION -->
+        <section class="about sc-hidden" id="about">
+            <h2>Tech DNA</h2>
+            <div class="about-grid">
+
+                <div class="terminal-block">
+                    <div class="terminal-header">
+                        <div class="term-dot"></div>
+                        <div class="term-dot"></div>
+                        <div class="term-dot"></div>
+                    </div>
+                    <div class="terminal-content">
+                        <span class="comment"># Initialize developer</span><br>
+                        <span class="keyword">print</span>(<span class="string">"Hi, I'm [Harsh]"</span>)<br><br>
+                        <span class="comment"># Status check</span><br>
+                        <span class="keyword">while</span> debugging_career_path:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;loss_curve.direction = <span class="string">"down"</span><br><br>
+                        <span class="comment"># Mission</span><br>
+                        I study <span class="keyword">AI & ML</span> — not to automate the world, but to understand it
+                        better. Passionate about models that are explainable, fair, and actually useful outside a
+                        Jupyter notebook.
+                    </div>
+                </div>
+
+                <div class="about-text glass-panel">
+                    <p>Let's build something worth trusting.</p>
+                    <p>If you're working on something that matters, I want to be in that room. I'm not just looking for
+                        an opportunity—I'm looking for the <strong>right problem</strong>.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- EXPERIENCE SECTION -->
+        <section class="experience sc-hidden" id="experience">
+            <h2>Experience</h2>
+            <div class="glass-panel delay-1" style="border-left: 4px solid var(--accent-teal); padding: 30px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h3 style="font-size: 1.8rem; color: #fff; margin-bottom: 5px;">Data Science Intern</h3>
+                        <p style="color: var(--accent-teal); font-weight: 600; font-size: 1.1rem;">Zidio Development</p>
+                    </div>
+                    <span
+                        style="background: rgba(255,255,255,0.05); padding: 6px 15px; border-radius: 20px; color: var(--text-muted); font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.1);">Aug
+                        2025 - Oct 2025</span>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7; font-size: 1.1rem; max-width: 800px;">
+                    Completed a 2-month internship focusing on computer vision and deep learning techniques.
+                    Successfully developed, trained, and optimized an <strong>Image Captioning Model</strong>,
+                    integrating vision models with natural language generation to automatically describe visual data
+                    content with high accuracy.
+                </p>
+            </div>
+        </section>
+
+        <!-- PROJECTS SECTION -->
+        <section class="projects sc-hidden" id="projects">
+            <h2>Architectures</h2>
+            <div class="projects-grid">
+
+                <!-- Project 1 -->
+                <div class="project-card glass-panel delay-1">
+                    <span class="project-meta">Deep Learning</span>
+                    <h3>Predictive Model</h3>
+                    <p>Designed and trained a deep neural network to visualize and predict complex datasets with high
+                        accuracy natively in Python.</p>
+                    <div class="tech-stack">
+                        <span>Python</span>
+                        <span>PyTorch</span>
+                        <span>Pandas</span>
+                    </div>
+                    <a href="#" class="btn" style="padding: 10px 20px; font-size: 0.85rem;">View Source</a>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card glass-panel delay-2">
+                    <span class="project-meta">RAG Pipeline</span>
+                    <h3>LLM Knowledge Base</h3>
+                    <p>Built a Retrieval-Augmented Generation system allowing natural language querying seamlessly
+                        integrated with local documentation.</p>
+                    <div class="tech-stack">
+                        <span>LangChain</span>
+                        <span>VectorDB</span>
+                        <span>OpenAI API</span>
+                    </div>
+                    <a href="#" class="btn" style="padding: 10px 20px; font-size: 0.85rem;">View Source</a>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card glass-panel delay-3">
+                    <span class="project-meta">Data Science</span>
+                    <h3>Statistical Analyzer</h3>
+                    <p>A statistical analysis tool automating exploratory data analysis workflows and generating
+                        automated insights.</p>
+                    <div class="tech-stack">
+                        <span>Python</span>
+                        <span>SciKit-Learn</span>
+                        <span>Seaborn</span>
+                    </div>
+                    <a href="#" class="btn" style="padding: 10px 20px; font-size: 0.85rem;">View Source</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SKILLS SECTION -->
+        <section class="skills sc-hidden" id="skills">
+            <h2>Competency Matrix</h2>
+            <div class="skills-container delay-1">
+                <div class="skill-tag">Python</div>
+                <div class="skill-tag">Machine Learning</div>
+                <div class="skill-tag">Deep Learning</div>
+                <div class="skill-tag">Data Structures</div>
+                <div class="skill-tag">MySQL</div>
+                <div class="skill-tag">LLM </div>
+                <div class="skill-tag">RAG </div>
+                <div class="skill-tag">Statistics</div>
+                <div class="skill-tag">Transfer Learning</div>
+                <div class="skill-tag">OPENAI</div>
+                <div class="skill-tag">Langchain</div>
+                <div class="skill-tag">Github</div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section class="contact sc-hidden" id="contact">
+            <h2 style="text-align: center; width: 100%; margin-bottom: 20px;">Initialize Connection</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 1.15rem;">
+                Or reach out directly at <br>
+                <a href="mailto:harsh.sharma4131@gmail.com"
+                    style="color: var(--accent-teal); text-decoration: none; font-weight: 600; font-size: 1.3rem; display: inline-block; margin-top: 10px;">harsh.sharma4131@gmail.com</a>
+            </p>
+            <div class="glass-panel">
+                <form action="#" method="POST"
+                    onsubmit="event.preventDefault(); alert('Message sent via neural link!');">
+                    <input type="text" placeholder="Your Identity (Name)" required>
+                    <input type="email" placeholder="Return Address (Email)" required>
+                    <textarea placeholder="Transmit Payload (Message)" required></textarea>
+                    <button type="submit" class="btn">Establish Handshake</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ==========================================
+        // 1. Intersection Observer for graceful reveals
+        // ==========================================
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('sc-show');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.sc-hidden').forEach(el => observer.observe(el));
+
+        // ==========================================
+        // 2. Three.js: Interactive Node Graph (Like mwasif.dev particles)
+        // ==========================================
+        const container = document.getElementById('canvas-container');
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0a0a, 0.001); // Deeper fade out
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 150;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- Geometric Nodes Setup ---
+        const particleCount = window.innerWidth > 768 ? 400 : 200; // Less on mobile for performance
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = [];
+
+        // Distribute particles randomly in a large volume
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 400; // x
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 400; // y
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 400; // z
+
+            velocities.push({
+                x: (Math.random() - 0.5) * 0.2,
+                y: (Math.random() - 0.5) * 0.2,
+                z: (Math.random() - 0.5) * 0.2
+            });
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        // Create the particle dots
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0x00FFC6,
+            size: 1.5,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particlesMesh = new THREE.Points(geometry, particleMaterial);
+        scene.add(particlesMesh);
+
+        // --- Connecting Lines Setup ---
+        // To create a node graph, we draw lines between close particles
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x00FFC6,
+            transparent: true,
+            opacity: 0.15,
+            blending: THREE.AdditiveBlending
+        });
+
+        // We'll dynamically generate line geometry each frame
+        const lineGeometry = new THREE.BufferGeometry();
+        const linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(linesMesh);
+
+        // --- Interaction ---
+        let mouse = new THREE.Vector2(-1000, -1000); // Start far away
+        const mouseRadius = 60; // How far mouse affects particles
+
+        document.addEventListener('mousemove', (event) => {
+            // Normalize mouse coordinates for 3D world mapping
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        let scrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            scrollY = window.scrollY;
+        });
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Access the buffer array directly to modify positions
+            const positionsArray = particlesMesh.geometry.attributes.position.array;
+
+            // Map 2D mouse to approximate 3D plane
+            const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+            vector.unproject(camera);
+            const dir = vector.sub(camera.position).normalize();
+            const distance = - camera.position.z / dir.z;
+            const mousePos3D = camera.position.clone().add(dir.multiplyScalar(distance));
+
+            const linePositions = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                let px = positionsArray[i * 3];
+                let py = positionsArray[i * 3 + 1];
+                let pz = positionsArray[i * 3 + 2];
+
+                // Add velocity to position
+                px += velocities[i].x;
+                py += velocities[i].y;
+                pz += velocities[i].z;
+
+                // Bounce off invisible boundaries
+                if (px > 200 || px < -200) velocities[i].x *= -1;
+                if (py > 200 || py < -200) velocities[i].y *= -1;
+                if (pz > 200 || pz < -200) velocities[i].z *= -1;
+
+                // Mouse interaction - Attractor/Repulsor effect
+                const dx = mousePos3D.x - px;
+                const dy = mousePos3D.y - py;
+                const distToMouse = Math.sqrt(dx * dx + dy * dy);
+
+                if (distToMouse < mouseRadius) {
+                    const force = (mouseRadius - distToMouse) / mouseRadius;
+                    // Push particles away slightly
+                    px -= (dx / distToMouse) * force * 1.5;
+                    py -= (dy / distToMouse) * force * 1.5;
+                }
+
+                // Apply scroll parallax
+                py += scrollY * 0.0001;
+
+                positionsArray[i * 3] = px;
+                positionsArray[i * 3 + 1] = py;
+                positionsArray[i * 3 + 2] = pz;
+
+                // Check distance to other particles to draw lines
+                for (let j = i + 1; j < particleCount; j++) {
+                    const p2x = positionsArray[j * 3];
+                    const p2y = positionsArray[j * 3 + 1];
+                    const p2z = positionsArray[j * 3 + 2];
+
+                    const distNode = Math.sqrt(Math.pow(px - p2x, 2) + Math.pow(py - p2y, 2) + Math.pow(pz - p2z, 2));
+
+                    // Only draw lines if nodes are close enough
+                    if (distNode < 35) {
+                        linePositions.push(px, py, pz);
+                        linePositions.push(p2x, p2y, p2z);
+                    }
+                }
+            }
+
+            particlesMesh.geometry.attributes.position.needsUpdate = true;
+
+            // Build geometry for connecting lines
+            linesMesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+
+            // Slowly rotate entire scene for depth
+            scene.rotation.y += 0.001;
+            scene.rotation.x += 0.0005;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // --- Window Resize Handling ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+    </script>
+</body>
+
+</html>
