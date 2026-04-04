@@ -491,6 +491,12 @@
     <!-- Target for Three.js Node Graph Background -->
     <div id="canvas-container"></div>
 
+    <!-- Notification Banner -->
+    <div id="notification"
+        style="position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--accent-teal); color: #000; padding: 15px 30px; font-weight: bold; border-radius: 8px; z-index: 9999; transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,255,198,0.3);">
+        Message successfully transmitted!
+    </div>
+
     <main>
         <!-- HERO SECTION -->
         <section class="hero sc-hidden" id="home">
@@ -664,12 +670,15 @@
                     style="color: var(--accent-teal); text-decoration: none; font-weight: 600; font-size: 1.3rem; display: inline-block; margin-top: 10px;">harsh.sharma4131@gmail.com</a>
             </p>
             <div class="glass-panel">
-                <form action="#" method="POST"
-                    onsubmit="event.preventDefault(); alert('Message sent via neural link!');">
-                    <input type="text" placeholder="Your Identity (Name)" required>
-                    <input type="email" placeholder="Return Address (Email)" required>
-                    <textarea placeholder="Transmit Payload (Message)" required></textarea>
-                    <button type="submit" class="btn">Establish Handshake</button>
+                <form id="contactForm" action="https://formsubmit.co/ajax/harsh.sharma4131@gmail.com" method="POST">
+                    <!-- Configuration for FormSubmit -->
+                    <input type="hidden" name="_subject" value="New connection from Portfolio Website!">
+                    <input type="hidden" name="_captcha" value="false">
+
+                    <input type="text" name="name" placeholder="Your Identity (Name)" required>
+                    <input type="email" name="email" placeholder="Return Address (Email)" required>
+                    <textarea name="message" placeholder="Transmit Payload (Message)" required></textarea>
+                    <button type="submit" class="btn" id="submitBtn">Establish Connection</button>
                 </form>
             </div>
         </section>
@@ -860,6 +869,54 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+        // --- Ajax Form Submission ---
+        const contactForm = document.getElementById('contactForm');
+        const notification = document.getElementById('notification');
+        const submitBtn = document.getElementById('submitBtn');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent standard page redirect
+
+            // Show transferring state
+            const originalBtnText = submitBtn.innerText;
+            submitBtn.innerText = "Transmitting...";
+            submitBtn.style.opacity = "0.7";
+            submitBtn.disabled = true;
+
+            const formData = new FormData(contactForm);
+
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: "POST",
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Show smooth notification from top
+                    notification.style.top = "40px";
+
+                    // Clear the form fields inside the glass panel
+                    contactForm.reset();
+
+                    // Hide notification after 4 seconds
+                    setTimeout(() => {
+                        notification.style.top = "-100px";
+                    }, 4000);
+                } else {
+                    alert("Error sending message. Please ensure you have activated your form via email.");
+                }
+            } catch (error) {
+                console.error("Form transmission failed:", error);
+                alert("Network error occurred while sending.");
+            } finally {
+                // Restore button state
+                submitBtn.innerText = originalBtnText;
+                submitBtn.style.opacity = "1";
+                submitBtn.disabled = false;
+            }
         });
 
     </script>
